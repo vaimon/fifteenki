@@ -6,14 +6,26 @@
 
 #IncludeRegexTransform: 
 
+C:/Code/fifteenki/Game.cpp
+Game.h
+C:/Code/fifteenki/Game.h
+
 C:/Code/fifteenki/Game.h
 iostream
+-
+random
+-
+algorithm
 -
 vector
 -
 string
 -
 sstream
+-
+array
+-
+deque
 -
 
 C:/Code/fifteenki/main.cpp

@@ -1,13 +1,8 @@
 //
 // Created by niko1 on 10.09.2021.
 //
-#include <random>
-#include <algorithm>
-#include <functional>
-
 #include "Game.h"
 
-Game::State::State(Game::State *parent) : parent(parent) {}
 
 Game::Game() {
     for (int i = 0; i < 15; ++i) {
@@ -16,7 +11,7 @@ Game::Game() {
     std::shuffle(std::begin(gameState), std::prev(std::end(gameState)),std::default_random_engine(std::random_device{}()));
     gameState[15] = 0;
     currentPosition = 15;
-    initializeMoves();
+    movesNumber = 0;
 }
 
 
@@ -35,50 +30,31 @@ void Game::printGame() {
     std::cout << std::endl;
 }
 
-Game::Game(const unsigned short* gameField) {
+Game::Game(const std::array<ushort,16> gameField) {
     for(int i = 0; i < 16; i++){
         gameState[i] = gameField[i];
     }
     gameState[15] = 0;
     currentPosition = 15;
-    initializeMoves();
-}
-
-
-void Game::initializeMoves() {
-    possibleMoves.resize(16);
-    possibleMoves[0] = {1,4};
-    possibleMoves[1] = {0,2,5};
-    possibleMoves[2] = {1,3,6};
-    possibleMoves[3] = {2,7};
-    possibleMoves[4] = {0,5,8};
-    possibleMoves[5] = {1,4,6,9};
-    possibleMoves[6] = {2,5,7,10};
-    possibleMoves[7] = {3,6,11};
-    possibleMoves[8] = {4,9,12};
-    possibleMoves[9] = {5,8,10,13};
-    possibleMoves[10] = {6,9,11,14};
-    possibleMoves[11] = {7,10,15};
-    possibleMoves[12] = {8,13};
-    possibleMoves[13] = {9,12,14};
-    possibleMoves[14] = {10,13,15};
-    possibleMoves[15] = {11,14};
+    movesNumber = 0;
 }
 
 std::vector<unsigned short> Game::getAvailableMoves(unsigned short position) {
     return possibleMoves[position];
 }
 
-std::vector<unsigned short> Game::getAvailableMoves() {
+std::vector<unsigned short> Game::getAvailableMoves() const {
     return getAvailableMoves(currentPosition);
 }
 
 void Game::makeMove(unsigned short position) {
     auto av= getAvailableMoves();
     if(std::find(av.begin(), av.end(), position) != av.end()){
+        movesHistory.push_back(gameState);
         gameState[currentPosition] = gameState[position];
         currentPosition = position;
         gameState[currentPosition] = 0;
+        movesNumber++;
     } else{
         throw std::exception("You have tried to make an illegal move.");
     }
@@ -148,6 +124,7 @@ void Game::playGame() {
         int c;
         std::cin >> c;
         makeMove(av[c-1]);
+        printHistory();
     }
     std::cout << "Wow... You won..." << std::endl;
 }
@@ -161,9 +138,22 @@ bool Game::isFinish() {
     return true;
 }
 
+void Game::printHistory() {
+    for(int i = 1; i < movesHistory.size(); i++){
+        for(auto x: movesHistory[i]){
+            std::cout << x << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
 Game::Game(std::string hexString) {
     std::cout << "ok" << std::endl;
     for(int i = 0; i < 16; i++){
         gameState[i] = hexToUshort(hexString[i]);
+        if(gameState[i] == 0){
+            currentPosition = i;
+        }
     }
+    movesNumber = 0;
 }
