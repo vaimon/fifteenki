@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Code/fifteenki/Game.h
+iostream
+-
+vector
+-
+string
+-
+sstream
+-
+
+C:/Code/fifteenki/main.cpp
+iostream
+-
+Game.h
+C:/Code/fifteenki/Game.h
+
