@@ -191,6 +191,74 @@ std::array<ushort, 16> Game::getStateAfterMove(std::array<unsigned short, 16> no
     return newNode;
 }
 
+void Game::solve() {
+    if(!isSolvable()){
+        std::cout << "No solution" << std::endl;
+        return;
+    }
+    //std::deque<std::array<ushort, 16>> movesHistory{};
+    movesHistory.push_back(gameState);
+    uint bound = h(gameState);
+    while(true){
+        uint t = ida_star(bound);
+        if (t == -1){
+            std::cout << "Number of moves: "<< movesHistory.size() - 1 << std::endl;
+            return;
+        } else if (t == INT32_MAX){
+            std::cout << "Well, congratulations, everything is screwed up." << std::endl;
+            return;
+        }
+        bound = t;
+    }
+}
+
+uint Game::ida_star(unsigned int bound) {
+    std::array<ushort, 16> node = movesHistory.back();
+    uint f = movesHistory.size() + h(node);
+    if (f > bound){
+        return f;
+    }
+    if(isFinish(node)){
+        return -1;
+    }
+    uint min = INT32_MAX;
+    for (std::array<ushort,16> sNode: successors(node)){
+        movesHistory.push_back(sNode);
+        uint t = ida_star(bound);
+        if(t == -1){
+            return -1;
+        }
+        if(t < min){
+            min = t;
+        }
+        movesHistory.pop_back();
+    }
+    return min;
+}
+
+std::vector<std::array<ushort, 16>> Game::successors(std::array<unsigned short, 16> node) {
+    std::vector<std::array<ushort,16>> res {};
+    int i = 0;
+    for(; i < 16; i++){
+        if(node[i] == 0){
+            break;
+        }
+    }
+    for (ushort move: getAvailableMoves(i)) {
+        res.push_back(getStateAfterMove(node,move));
+    }
+    return res;
+}
+
+bool Game::isFinish(std::array<unsigned short, 16> state) {
+    for (int i = 0; i < 15; ++i) {
+        if(state[i]!= i + 1){
+            return false;
+        }
+    }
+    return true;
+}
+
 Game::Game(std::string hexString) {
     for(int i = 0; i < 16; i++){
         gameState[i] = hexToUshort(hexString[i]);
