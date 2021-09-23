@@ -130,12 +130,7 @@ void Game::playGame() {
 }
 
 bool Game::isFinish() {
-    for (int i = 0; i < 15; ++i) {
-        if(gameState[i]!= i + 1){
-            return false;
-        }
-    }
-    return true;
+    return isFinish(gameState);
 }
 
 void Game::printHistory() {
@@ -167,6 +162,34 @@ bool Game::isSolvable() {
     } else {
         return !(cnt % 2);
     }
+}
+
+uint Game::pathToPosition(int idealposition, int position) {
+    return abs((idealposition/4) - (position/4)) + abs((idealposition % 4) - (position % 4));
+}
+
+uint Game::h(std::array<unsigned short, 16> state) {
+    uint res = 0;
+    for (int i = 0; i < 16; ++i) {
+        if(state[i] == 0){
+            continue;
+        }
+        res += pathToPosition(state[i]-1, i);
+    }
+    return res;
+}
+
+std::array<ushort, 16> Game::getStateAfterMove(std::array<unsigned short, 16> node, unsigned short movedPosition) {
+    std::array<ushort,16> newNode{};
+    for (int i = 0; i < 16; ++i) {
+        if(node[i] == 0){
+            newNode[i] = node[movedPosition];
+            continue;
+        }
+        newNode[i] = node[i];
+    }
+    newNode[movedPosition] = 0;
+    return newNode;
 }
 
 Game::Game(std::string hexString) {
