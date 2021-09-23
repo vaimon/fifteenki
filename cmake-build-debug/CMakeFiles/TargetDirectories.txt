@@ -1,3 +1,0 @@
-C:/Code/fifteenki/cmake-build-debug/CMakeFiles/fifteenki.dir
-C:/Code/fifteenki/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Code/fifteenki/cmake-build-debug/CMakeFiles/rebuild_cache.dir
