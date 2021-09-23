@@ -90,10 +90,10 @@ public:
         while(true){
             uint t = ida_star(bound);
             if (t == -1){
-                std::cout << "good" << std::endl;
+                std::cout << "Number of moves: "<< movesHistory.size() - 1 << std::endl;
                 return;
             } else if (t == INT32_MAX){
-                std::cout << "bad" << std::endl;
+                std::cout << "Well, congratulations, everything is screwed up." << std::endl;
                 return;
             }
             bound = t;

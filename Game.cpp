@@ -156,7 +156,6 @@ bool Game::isSolvable() {
                 cnt++;
         }
     }
-    std::cout << cnt << std::endl;
     if (pos <= 3 || (pos >= 8 && pos <= 11)) {
         return cnt % 2;
     } else {
@@ -193,7 +192,6 @@ std::array<ushort, 16> Game::getStateAfterMove(std::array<unsigned short, 16> no
 }
 
 Game::Game(std::string hexString) {
-    std::cout << "ok" << std::endl;
     for(int i = 0; i < 16; i++){
         gameState[i] = hexToUshort(hexString[i]);
         if(gameState[i] == 0){
