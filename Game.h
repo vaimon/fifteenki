@@ -65,6 +65,9 @@ public:
     void playGame();
 
     void printHistory();
+
+    // https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
+    bool isSolvable();
 };
 
 

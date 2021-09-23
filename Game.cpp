@@ -147,6 +147,28 @@ void Game::printHistory() {
     }
 }
 
+bool Game::isSolvable() {
+    int pos = 0;
+    for (; pos < 16; pos++) {
+        if (gameState[pos] == 0) {
+            break;
+        }
+    }
+    int cnt = 0;
+    for (int i = 0; i < 15; i++) {
+        for (int j = i + 1; j < 16; j++) {
+            if (gameState[j] && gameState[i] && gameState[i] > gameState[j])
+                cnt++;
+        }
+    }
+    std::cout << cnt << std::endl;
+    if (pos <= 3 || (pos >= 8 && pos <= 11)) {
+        return cnt % 2;
+    } else {
+        return !(cnt % 2);
+    }
+}
+
 Game::Game(std::string hexString) {
     std::cout << "ok" << std::endl;
     for(int i = 0; i < 16; i++){

@@ -6,9 +6,9 @@ int main() {
 //    Game g (state);
 //    Game g ("123456789ABCDEF0");
     Game g;
-//    g.printGame();
+    g.printGame();
 //    g.makeMove(11);
 //    g.printGame();
-    g.playGame();
+//    g.playGame();
     return 0;
 }
