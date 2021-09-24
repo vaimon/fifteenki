@@ -86,20 +86,14 @@ public:
     static uint computeLinearConflicts(std::array<ushort, 16> state){
         uint res = 0;
         for (int i = 0; i < 4; ++i) {
-            int skip = 4;
             for (int j = 0; j < 3; ++j) {
-                if(j == skip){
-                    continue;
-                }
                 for (int k = j + 1; k < 4; ++k) {
-                    if(state[4*i + k] == 0 || k == skip){
+                    if(state[4*i + k] == 0){
                         continue;
                     }
                     if(state[4*i + j] > state[4*i + k]){
-                        skip = k;
-                        //std::cout<< (4*i + j) << "(" << state[4*i + j] << ") => " << (4*i + k) << "(" << state[4*i + k] << ")" << "skip = " << skip << std::endl;
+                        //std::cout<< (4*i + j) << "(" << state[4*i + j] << ") => " << (4*i + k) << "(" << state[4*i + k] << ")" << std::endl;
                         res +=2;
-                        break;
                     }
                 }
             }

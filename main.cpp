@@ -20,10 +20,11 @@ int main() {
         duration<double, std::milli> timeAmount = timerEnd - timerStart;
         std::cout << "Time taken: " << timeAmount.count() / 1000.0 << "s." << std::endl<<std::endl;
     }
+
 //    g.makeMove(11);
 //    g.printGame();
 //    g.playGame();
-    //Game g("16245A3709C8DEBF");
-    //g.ha();
+    Game g("16245A3709C8DEBF");
+    g.ha();
     return 0;
 }
