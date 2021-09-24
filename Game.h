@@ -82,6 +82,35 @@ public:
 
     static uint pathToPosition(int idealposition, int position);
 
+
+    static uint computeLinearConflicts(std::array<ushort, 16> state){
+        uint res = 0;
+        for (int i = 0; i < 4; ++i) {
+            int skip = 4;
+            for (int j = 0; j < 3; ++j) {
+                if(j == skip){
+                    continue;
+                }
+                for (int k = j + 1; k < 4; ++k) {
+                    if(state[4*i + k] == 0 || k == skip){
+                        continue;
+                    }
+                    if(state[4*i + j] > state[4*i + k]){
+                        skip = k;
+                        //std::cout<< (4*i + j) << "(" << state[4*i + j] << ") => " << (4*i + k) << "(" << state[4*i + k] << ")" << "skip = " << skip << std::endl;
+                        res +=2;
+                        break;
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    void ha(){
+        std::cout << computeLinearConflicts(gameState) << std::endl;
+    }
+
     // Manhattan distance
     static uint h(std::array<ushort, 16> state);
 

@@ -175,6 +175,7 @@ uint Game::h(std::array<unsigned short, 16> state) {
         }
         res += pathToPosition(state[i]-1, i);
     }
+    //res+= computeLinearConflicts(state);
     return res;
 }
 

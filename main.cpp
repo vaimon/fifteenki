@@ -23,5 +23,7 @@ int main() {
 //    g.makeMove(11);
 //    g.printGame();
 //    g.playGame();
+    //Game g("16245A3709C8DEBF");
+    //g.ha();
     return 0;
 }
