@@ -175,7 +175,7 @@ uint Game::h(std::array<unsigned short, 16> state) {
         }
         res += pathToPosition(state[i]-1, i);
     }
-    res+= computeLinearConflicts(state);
+    res+= computeLinearConflicts(state) + computeCornerConflicts(state) + computeLastMove(state);
     return res;
 }
 
@@ -283,21 +283,44 @@ uint Game::computeLinearConflicts(std::array<unsigned short, 16> state) {
             }
         }
     }
+    /*
+        for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if((((state[4*i + j] - 1) >= 4 * i) && ((state[4*i + j] - 1) < 4 * (i + 1)))){
+                for (int k = j + 1; k < 4; ++k) {
+                    if((((state[4*i + k] - 1) >= 4 * i) && ((state[4*i + k] - 1) < 4 * (i + 1)))){
+                        if(state[4*i + j] > state[4*i + k]){
+                            res += 2;
+                        }
+                    }
+                }
+            }
+            if((state[4 * j + i] - 1 - i) % 4 == 0 && (state[4 * j + i] - 1 - i)/4 == j){
+                for (int l = j + 1; l < 4; ++l) {
+                    if((state[4 * l + i] - 1 - i) % 4 == 0 || (state[4 * l + i] - 1 - i) / 4 == l){
+                        if(state[4*i + i] > state[4 * l + i]){
+                            res += 2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+     */
+    return res;
+}
 
-//        for (int i = 0; i < 3; ++i) {
-//            for (int j = 0; j < 4; ++j) {
-//                if((state[4 * i + j] - 1 - j) % 4 != 0){
-//                    continue;
-//                }
-//                for (int k = i + 1; k < 4; ++k) {
-//                    if((state[4 * k + j] - 1 - j) % 4 == 0){
-//                        if(state[4*i + j] > state[4*k + j]){
-//                            res += 2;
-//                        }
-//                    }
-//                }
-//            }
-//        }
+uint Game::computeCornerConflicts(std::array<unsigned short, 16> state) {
+    uint res = 0;
+    if(state[0] != 1 && (state[1] == 2 || state[4] == 5)){
+        res +=2;
+    }
+    if(state[3]!= 4 && (state[2] == 3 || state[7] == 8)){
+        res += 2;
+    }
+    if(state[12] != 13 && (state[8] == 9 || state [13] == 14)){
+        res+=2;
+    }
     return res;
 }
 
@@ -310,6 +333,13 @@ long long Game::hashState(std::array<unsigned short, 16> state) {
         shift+=4;
     }
     return hash;
+}
+
+unsigned int Game::computeLastMove(std::array<unsigned short, 16> state) {
+    if(state[15] == 15 || state[15] == 12){
+        return 0;
+    }
+    return 2;
 }
 
 Game::Game(std::string hexString) {

@@ -87,6 +87,8 @@ public:
 
     static uint computeLinearConflicts(std::array<ushort, 16> state);
 
+    static uint computeCornerConflicts(std::array<ushort, 16> state);
+
     void ha(){
         std::cout << computeLinearConflicts(gameState) << std::endl;
     }
@@ -95,6 +97,8 @@ public:
     static uint h(std::array<ushort, 16> state);
 
     long long hashState(std::array<ushort, 16> state);
+
+    static unsigned int computeLastMove(std::array<unsigned short, 16> state);
 };
 
 
