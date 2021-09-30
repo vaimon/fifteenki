@@ -13,6 +13,8 @@ int main() {
 //    Game g("1234067859ACDEBF");
 //    g.solve();
 
+//    Game g("0FEDCBA987654321");
+//    g.ha();
     std::vector<std::string> inputs{"F2345678A0BE91CD", "123456789AFB0EDC", "123456789ABCDEF0", "1234067859ACDEBF",
                                     "5134207896ACDEBF", "16245A3709C8DEBF", "1723068459ACDEBF", "12345678A0BE9FCD",
                                     "51247308A6BE9FCD", "F2345678A0BE91DC", "75123804A6BE9FCD", "75AB2C416D389F0E",
