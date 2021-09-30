@@ -2,6 +2,7 @@
 // Created by niko1 on 10.09.2021.
 //
 #include "Game.h"
+#include "WalkingDistance.h"
 
 
 Game::Game() {
@@ -45,7 +46,7 @@ std::vector<unsigned short> Game::getAvailableMoves(unsigned short position) {
 }
 
 std::vector<unsigned short> Game::getAvailableMoves() const {
-    return getAvailableMoves(currentPosition);
+    return {};
 }
 
 void Game::makeMove(unsigned short position) {
@@ -219,6 +220,21 @@ std::array<ushort, 16> Game::getStateAfterMove(std::array<unsigned short, 16> no
     for (int i = 0; i < 16; ++i) {
         if (node[i] == 0) {
             newNode[i] = node[movedPosition];
+
+            if(movedPosition - 4 == i){
+                wdRowIndex.push_back(WalkingDistance::edgesDown[wdRowIndex.back()]
+                [WalkingDistance::row[newNode[i]]]);
+            } else if(movedPosition + 4 == i){
+                wdRowIndex.push_back(WalkingDistance::edgesUp[wdRowIndex.back()]
+                [WalkingDistance::row[newNode[i]]]);
+            } else if(movedPosition - 1 == i){
+                wdColIndex.push_back(WalkingDistance::edgesDown[wdColIndex.back()]
+                [WalkingDistance::col[newNode[i]]]);
+            } else if(movedPosition + 1 == i){
+                wdColIndex.push_back(WalkingDistance::edgesUp[wdColIndex.back()]
+                                     [WalkingDistance::col[newNode[i]]]);
+            }
+
             continue;
         }
         newNode[i] = node[i];
@@ -234,6 +250,9 @@ void Game::solve() {
     }
     //std::deque<std::array<ushort, 16>> movesHistory{};
     movesHistory.push_back(gameState);
+    wdRowIndex.push_back(WalkingDistance::getIndex(gameState));
+    wdColIndex.push_back(WalkingDistance::getIndex(gameState,false));
+
     uint bound = h(gameState);
     while (true) {
         uint t = ida_star(bound);
@@ -275,6 +294,8 @@ uint Game::ida_star(unsigned int bound) {
             min = t;
         }
         movesHistory.pop_back();
+        wdColIndex.pop_back();
+        wdRowIndex.pop_back();
     }
     return min;
 }
@@ -372,11 +393,11 @@ uint Game::invertDistance_h(std::array<unsigned short, 16> state) {
 }
 
 uint Game::h(std::array<unsigned short, 16> state) {
-    return manhattan_h(state);
+    return  walkingDistance_h(state);
 }
 
 uint Game::walkingDistance_h(std::array<unsigned short, 16> state) {
-    return 0;
+    return WalkingDistance::costs[wdRowIndex.back()] + WalkingDistance::costs[wdColIndex.back()];
 }
 
 Game::Game(std::string hexString) {

@@ -41,6 +41,8 @@ class Game {
     ushort movesNumber;
     std::deque<std::array<ushort, 16>> movesHistory{};
     std::map<long long, uint> previousStates{};
+    std::deque<uint> wdRowIndex{};
+    std::deque<uint> wdColIndex{};
 
     static ushort hexToUshort(char c);
 
@@ -57,7 +59,7 @@ public:
 
     [[nodiscard]] std::vector<ushort> getAvailableMoves() const;
 
-    static std::vector<ushort> getAvailableMoves(ushort position);
+    std::vector<ushort> getAvailableMoves(ushort position);
 
     void makeMove(ushort position);
 
@@ -72,37 +74,37 @@ public:
     // https://www.geeksforgeeks.org/check-instance-15-puzzle-solvable/
     bool isSolvable();
 
-    static bool isFinish(std::array<ushort, 16> state);
+    bool isFinish(std::array<ushort, 16> state);
 
     void solve();
 
     uint ida_star(uint bound);
 
-    static std::vector<std::array<ushort,16>> successors(std::array<ushort,16> node);
+    std::vector<std::array<ushort,16>> successors(std::array<ushort,16> node);
 
-    static std::array<ushort,16> getStateAfterMove(std::array<ushort,16> node, ushort movedPosition);
+    std::array<ushort,16> getStateAfterMove(std::array<ushort,16> node, ushort movedPosition);
 
-    static uint pathToPosition(int idealposition, int position);
+    uint pathToPosition(int idealposition, int position);
 
 
-    static uint computeLinearConflicts(std::array<ushort, 16> state);
+    uint computeLinearConflicts(std::array<ushort, 16> state);
 
     void ha(){
         std::cout << invertDistance_h(gameState) << " >= " << manhattan_h(gameState) << std::endl;
     }
 
     // Manhattan distance
-    static uint manhattan_h(std::array<ushort, 16> state);
+    uint manhattan_h(std::array<ushort, 16> state);
 
-    static long long hashState(std::array<ushort, 16> state);
+    long long hashState(std::array<ushort, 16> state);
 
-    static uint getRowConflicts(std::array<unsigned short, 16> state);
+    uint getRowConflicts(std::array<unsigned short, 16> state);
 
-    static uint getColConflicts(std::array<unsigned short, 16> state);
+    uint getColConflicts(std::array<unsigned short, 16> state);
 
-    static uint invertDistance_h(std::array<ushort, 16> state);
+    uint invertDistance_h(std::array<ushort, 16> state);
 
-    static uint h (std::array<ushort,16> state);
+    uint h (std::array<ushort,16> state);
 
     unsigned int walkingDistance_h(std::array<unsigned short, 16> state);
 };
