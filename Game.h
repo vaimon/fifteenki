@@ -88,13 +88,23 @@ public:
     static uint computeLinearConflicts(std::array<ushort, 16> state);
 
     void ha(){
-        std::cout << computeLinearConflicts(gameState) << std::endl;
+        std::cout << invertDistance_h(gameState) << " >= " << manhattan_h(gameState) << std::endl;
     }
 
     // Manhattan distance
-    static uint h(std::array<ushort, 16> state);
+    static uint manhattan_h(std::array<ushort, 16> state);
 
-    long long hashState(std::array<ushort, 16> state);
+    static long long hashState(std::array<ushort, 16> state);
+
+    static uint getRowConflicts(std::array<unsigned short, 16> state);
+
+    static uint getColConflicts(std::array<unsigned short, 16> state);
+
+    static uint invertDistance_h(std::array<ushort, 16> state);
+
+    static uint h (std::array<ushort,16> state);
+
+    unsigned int walkingDistance_h(std::array<unsigned short, 16> state);
 };
 
 
