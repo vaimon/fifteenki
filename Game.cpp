@@ -104,9 +104,9 @@ char Game::ushortToHex(unsigned short c) {
     }
 }
 
-std::string Game::toHexString() {
+std::string Game::toHexString(std::array<ushort, 16> gameField) {
     std::stringstream ss;
-    for (unsigned short i : gameState) {
+    for (unsigned short i : gameField) {
         ss << ushortToHex(i);
     }
     return ss.str();
@@ -175,6 +175,7 @@ uint Game::h(std::array<unsigned short, 16> state) {
         }
         res += pathToPosition(state[i]-1, i);
     }
+    res+= computeLinearConflicts(state);
     return res;
 }
 
@@ -214,7 +215,8 @@ void Game::solve() {
 
 uint Game::ida_star(unsigned int bound) {
     std::array<ushort, 16> node = movesHistory.back();
-    uint f = movesHistory.size() + h(node);
+    uint g = movesHistory.size();
+    uint f = g + h(node);
     if (f > bound){
         return f;
     }
@@ -223,6 +225,12 @@ uint Game::ida_star(unsigned int bound) {
     }
     uint min = INT32_MAX;
     for (std::array<ushort,16> sNode: successors(node)){
+        long long hash = hashState(sNode);
+        if(previousStates.find(hash) == previousStates.end() || g <= previousStates[hash]){
+            previousStates[hash] = g;
+        } else{
+            continue;
+        }
         movesHistory.push_back(sNode);
         uint t = ida_star(bound);
         if(t == -1){
@@ -257,6 +265,51 @@ bool Game::isFinish(std::array<unsigned short, 16> state) {
         }
     }
     return true;
+}
+
+uint Game::computeLinearConflicts(std::array<unsigned short, 16> state) {
+    uint res = 0;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if(!(((state[4*i + j] - 1) >= 4 * i) && ((state[4*i + j] - 1) < 4 * (i + 1)))){
+                continue;
+            }
+            for (int k = j + 1; k < 4; ++k) {
+                if((((state[4*i + k] - 1) >= 4 * i) && ((state[4*i + k] - 1) < 4 * (i + 1)))){
+                    if(state[4*i + j] > state[4*i + k]){
+                        res += 2;
+                    }
+                }
+            }
+        }
+    }
+
+//        for (int i = 0; i < 3; ++i) {
+//            for (int j = 0; j < 4; ++j) {
+//                if((state[4 * i + j] - 1 - j) % 4 != 0){
+//                    continue;
+//                }
+//                for (int k = i + 1; k < 4; ++k) {
+//                    if((state[4 * k + j] - 1 - j) % 4 == 0){
+//                        if(state[4*i + j] > state[4*k + j]){
+//                            res += 2;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+    return res;
+}
+
+long long Game::hashState(std::array<unsigned short, 16> state) {
+    long long hash = 0;
+    int shift = 0;
+    for(int i = state.size() - 1; i >= 0; i--){
+        auto shifted = ((long long)state[i]) << shift;
+        hash += shifted;
+        shift+=4;
+    }
+    return hash;
 }
 
 Game::Game(std::string hexString) {
