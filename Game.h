@@ -17,6 +17,7 @@
 #include <sstream>
 #include <array>
 #include <deque>
+#include <map>
 
 class Game {
     std::array<ushort, 16> gameState{};
@@ -39,6 +40,7 @@ class Game {
     ushort currentPosition;
     ushort movesNumber;
     std::deque<std::array<ushort, 16>> movesHistory{};
+    std::map<long long, uint> previousStates{};
 
     static ushort hexToUshort(char c);
 
@@ -59,7 +61,7 @@ public:
 
     void makeMove(ushort position);
 
-    std::string toHexString();
+    std::string toHexString(std::array<ushort, 16> gameField);
 
     bool isFinish();
 
@@ -83,23 +85,7 @@ public:
     static uint pathToPosition(int idealposition, int position);
 
 
-    static uint computeLinearConflicts(std::array<ushort, 16> state){
-        uint res = 0;
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 3; ++j) {
-                for (int k = j + 1; k < 4; ++k) {
-                    if(state[4*i + k] == 0){
-                        continue;
-                    }
-                    if(state[4*i + j] > state[4*i + k]){
-                        //std::cout<< (4*i + j) << "(" << state[4*i + j] << ") => " << (4*i + k) << "(" << state[4*i + k] << ")" << std::endl;
-                        res +=2;
-                    }
-                }
-            }
-        }
-        return res;
-    }
+    static uint computeLinearConflicts(std::array<ushort, 16> state);
 
     void ha(){
         std::cout << computeLinearConflicts(gameState) << std::endl;
@@ -108,6 +94,7 @@ public:
     // Manhattan distance
     static uint h(std::array<ushort, 16> state);
 
+    long long hashState(std::array<ushort, 16> state);
 };
 
 
