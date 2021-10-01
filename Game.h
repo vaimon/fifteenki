@@ -37,10 +37,14 @@ class Game {
                                                                        {9,  12, 14},
                                                                        {10, 13, 15},
                                                                        {11, 14}};
+    static inline const std::array<uint, 16> verticalSearch{0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15};
     ushort currentPosition;
     ushort movesNumber;
     std::deque<std::array<ushort, 16>> movesHistory{};
     std::map<long long, uint> previousStates{};
+    uint verticalID = 0;
+    uint horizontalID = 0;
+    bool isLastMoveVertical = false;
 
     static ushort hexToUshort(char c);
 
@@ -78,16 +82,16 @@ public:
 
     uint ida_star(uint bound);
 
-    static std::vector<std::array<ushort,16>> successors(std::array<ushort,16> node);
+    std::vector<std::pair<std::array<ushort, 16>, bool>> successors(std::array<ushort, 16> node);
 
-    static std::array<ushort,16> getStateAfterMove(std::array<ushort,16> node, ushort movedPosition);
+    static std::pair<std::array<ushort, 16>, bool> getStateAfterMove(std::array<ushort, 16> node, ushort movedPosition);
 
     static uint pathToPosition(int idealposition, int position);
 
 
     static uint computeLinearConflicts(std::array<ushort, 16> state);
 
-    void ha(){
+    void ha() {
         std::cout << invertDistance_h(gameState) << " >= " << manhattan_h(gameState) << std::endl;
     }
 
@@ -96,13 +100,13 @@ public:
 
     static long long hashState(std::array<ushort, 16> state);
 
-    static uint getRowConflicts(std::array<unsigned short, 16> state);
+    uint getRowConflicts(std::array<unsigned short, 16> state);
 
-    static uint getColConflicts(std::array<unsigned short, 16> state);
+    uint getColConflicts(std::array<unsigned short, 16> state);
 
-    static uint invertDistance_h(std::array<ushort, 16> state);
+    uint invertDistance_h(std::array<ushort, 16> state);
 
-    static uint h (std::array<ushort,16> state);
+    uint h(std::array<ushort, 16> state);
 
     unsigned int walkingDistance_h(std::array<unsigned short, 16> state);
 };

@@ -214,17 +214,21 @@ uint Game::manhattan_h(std::array<unsigned short, 16> state) {
     return res;
 }
 
-std::array<ushort, 16> Game::getStateAfterMove(std::array<unsigned short, 16> node, unsigned short movedPosition) {
+std::pair<std::array<ushort, 16>,bool> Game::getStateAfterMove(std::array<unsigned short, 16> node, unsigned short movedPosition) {
     std::array<ushort, 16> newNode{};
+    bool isVertical = false;
     for (int i = 0; i < 16; ++i) {
         if (node[i] == 0) {
             newNode[i] = node[movedPosition];
+            if(i == movedPosition + 4 || i == movedPosition - 4){
+                isVertical = true;
+            }
             continue;
         }
         newNode[i] = node[i];
     }
     newNode[movedPosition] = 0;
-    return newNode;
+    return std::make_pair(newNode,isVertical);
 }
 
 void Game::solve() {
@@ -259,7 +263,8 @@ uint Game::ida_star(unsigned int bound) {
         return -1;
     }
     uint min = INT32_MAX;
-    for (std::array<ushort, 16> sNode: successors(node)) {
+    for (std::pair<std::array<ushort, 16>,bool> pairNode: successors(node)) {
+        auto [sNode, isVertical] = pairNode;
         long long hash = hashState(sNode);
         if (previousStates.find(hash) == previousStates.end() || g <= previousStates[hash]) {
             previousStates[hash] = g;
@@ -267,6 +272,7 @@ uint Game::ida_star(unsigned int bound) {
             continue;
         }
         movesHistory.push_back(sNode);
+        isLastMoveVertical = isVertical;
         uint t = ida_star(bound);
         if (t == -1) {
             return -1;
@@ -279,8 +285,8 @@ uint Game::ida_star(unsigned int bound) {
     return min;
 }
 
-std::vector<std::array<ushort, 16>> Game::successors(std::array<unsigned short, 16> node) {
-    std::vector<std::array<ushort, 16>> res{};
+std::vector<std::pair<std::array<ushort, 16>,bool>> Game::successors(std::array<unsigned short, 16> node) {
+    std::vector<std::pair<std::array<ushort, 16>,bool>> res{};
     int i = 0;
     for (; i < 16; i++) {
         if (node[i] == 0) {
@@ -350,8 +356,8 @@ long long Game::hashState(std::array<unsigned short, 16> state) {
 uint Game::getRowConflicts(std::array<unsigned short, 16> state) {
     uint cnt = 0;
     for (int i = 0; i < 15; i++) {
-        for (int j = i; j < 16; j++) {
-            if (state[j] && state[i] && state[i] >= state[j])
+        for (int j = i + 1; j < 16; j++) {
+            if (state[j] && state[i] && state[i] > state[j])
                 cnt++;
         }
     }
@@ -359,20 +365,27 @@ uint Game::getRowConflicts(std::array<unsigned short, 16> state) {
 }
 
 uint Game::getColConflicts(std::array<unsigned short, 16> state) {
-    std::array<ushort, 16> transponedState = {state[0], state[4], state[8], state[12], state[1], state[5], state[9],
-                                              state[13], state[2], state[6], state[10], state[14], state[3], state[7],
-                                              state[11], state[15]};
-    return getRowConflicts(transponedState);
+    uint cnt = 0;
+    for (int i = 0; i < 15; i++) {
+        for (int j = i + 1; j < 16; j++) {
+            if (state[verticalSearch[j]] && state[verticalSearch[i]] && state[verticalSearch[i]] > state[verticalSearch[j]])
+                cnt++;
+        }
+    }
+    return cnt;
 }
 
 uint Game::invertDistance_h(std::array<unsigned short, 16> state) {
-    uint horizontal = getRowConflicts(state);
-    uint vertical = getColConflicts(state);
-    return (horizontal / 3 + horizontal % 3) + (vertical / 3 + vertical % 3);
+    if(isLastMoveVertical){
+        horizontalID = getRowConflicts(state);
+    } else{
+        verticalID = getColConflicts(state);
+    }
+    return (horizontalID / 3 + horizontalID % 3) + (verticalID / 3 + verticalID % 3);
 }
 
 uint Game::h(std::array<unsigned short, 16> state) {
-    return manhattan_h(state);
+    return invertDistance_h(state);
 }
 
 uint Game::walkingDistance_h(std::array<unsigned short, 16> state) {
