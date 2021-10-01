@@ -215,23 +215,24 @@ uint Game::manhattan_h(std::array<unsigned short, 16> state) {
     return res;
 }
 
-std::array<ushort, 16> Game::getStateAfterMove(std::array<unsigned short, 16> node, unsigned short movedPosition) {
+std::tuple<std::array<ushort, 16>,uint,uint> Game::getStateAfterMove(std::array<unsigned short, 16> node, unsigned short movedPosition) {
     std::array<ushort, 16> newNode{};
+    uint rowIndex = 0, colIndex = 0;
     for (int i = 0; i < 16; ++i) {
         if (node[i] == 0) {
             newNode[i] = node[movedPosition];
 
             if(movedPosition - 4 == i){
-                wdRowIndex.push_back(WalkingDistance::edgesDown[wdRowIndex.back()]
-                [WalkingDistance::row[newNode[i]]]);
+                rowIndex = WalkingDistance::edgesDown[wdRowIndex]
+                [WalkingDistance::row[newNode[i]]];
             } else if(movedPosition + 4 == i){
-                wdRowIndex.push_back(WalkingDistance::edgesUp[wdRowIndex.back()]
+                rowIndex = (WalkingDistance::edgesUp[wdRowIndex]
                 [WalkingDistance::row[newNode[i]]]);
             } else if(movedPosition - 1 == i){
-                wdColIndex.push_back(WalkingDistance::edgesDown[wdColIndex.back()]
+                colIndex = (WalkingDistance::edgesDown[wdColIndex]
                 [WalkingDistance::col[newNode[i]]]);
             } else if(movedPosition + 1 == i){
-                wdColIndex.push_back(WalkingDistance::edgesUp[wdColIndex.back()]
+                colIndex = (WalkingDistance::edgesUp[wdColIndex]
                                      [WalkingDistance::col[newNode[i]]]);
             }
 
@@ -240,7 +241,7 @@ std::array<ushort, 16> Game::getStateAfterMove(std::array<unsigned short, 16> no
         newNode[i] = node[i];
     }
     newNode[movedPosition] = 0;
-    return newNode;
+    return std::make_tuple(newNode,wdRowIndex,wdColIndex);
 }
 
 void Game::solve() {
@@ -250,12 +251,12 @@ void Game::solve() {
     }
     //std::deque<std::array<ushort, 16>> movesHistory{};
     movesHistory.push_back(gameState);
-    wdRowIndex.push_back(WalkingDistance::getIndex(gameState));
-    wdColIndex.push_back(WalkingDistance::getIndex(gameState,false));
+    wdRowIndex = (WalkingDistance::getIndex(gameState));
+    wdColIndex = (WalkingDistance::getIndex(gameState,false));
 
     uint bound = h(gameState);
     while (true) {
-        uint t = ida_star(bound);
+        uint t = ida_star(bound, 0);
         if (t == -1) {
             std::cout << "Number of moves: " << movesHistory.size() - 1 << std::endl;
             return;
@@ -267,9 +268,9 @@ void Game::solve() {
     }
 }
 
-uint Game::ida_star(unsigned int bound) {
+uint Game::ida_star(unsigned int bound, uint g) {
     std::array<ushort, 16> node = movesHistory.back();
-    uint g = movesHistory.size();
+    // uint g = movesHistory.size();
     uint f = g + h(node);
     if (f > bound) {
         return f;
@@ -278,7 +279,8 @@ uint Game::ida_star(unsigned int bound) {
         return -1;
     }
     uint min = INT32_MAX;
-    for (std::array<ushort, 16> sNode: successors(node)) {
+    for (std::tuple<std::array<ushort, 16>, uint, uint> tupleNode: successors(node)) {
+        auto& [sNode, rowInd, colInd] = tupleNode;
         long long hash = hashState(sNode);
         if (previousStates.find(hash) == previousStates.end() || g <= previousStates[hash]) {
             previousStates[hash] = g;
@@ -286,7 +288,9 @@ uint Game::ida_star(unsigned int bound) {
             continue;
         }
         movesHistory.push_back(sNode);
-        uint t = ida_star(bound);
+        wdRowIndex = rowInd;
+        wdColIndex = colInd;
+        uint t = ida_star(bound, g + 1);
         if (t == -1) {
             return -1;
         }
@@ -294,14 +298,12 @@ uint Game::ida_star(unsigned int bound) {
             min = t;
         }
         movesHistory.pop_back();
-        wdColIndex.pop_back();
-        wdRowIndex.pop_back();
     }
     return min;
 }
 
-std::vector<std::array<ushort, 16>> Game::successors(std::array<unsigned short, 16> node) {
-    std::vector<std::array<ushort, 16>> res{};
+std::vector<std::tuple<std::array<ushort, 16>,uint,uint>> Game::successors(std::array<unsigned short, 16> node) {
+    std::vector<std::tuple<std::array<ushort, 16>,uint,uint>> res{};
     int i = 0;
     for (; i < 16; i++) {
         if (node[i] == 0) {
@@ -397,7 +399,7 @@ uint Game::h(std::array<unsigned short, 16> state) {
 }
 
 uint Game::walkingDistance_h(std::array<unsigned short, 16> state) {
-    return WalkingDistance::costs[wdRowIndex.back()] + WalkingDistance::costs[wdColIndex.back()];
+    return WalkingDistance::costs[wdRowIndex] + WalkingDistance::costs[wdColIndex];
 }
 
 Game::Game(std::string hexString) {

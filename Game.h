@@ -41,8 +41,8 @@ class Game {
     ushort movesNumber;
     std::deque<std::array<ushort, 16>> movesHistory{};
     std::map<long long, uint> previousStates{};
-    std::deque<uint> wdRowIndex{};
-    std::deque<uint> wdColIndex{};
+    uint wdRowIndex = 0;
+    uint wdColIndex = 0;
 
     static ushort hexToUshort(char c);
 
@@ -78,11 +78,11 @@ public:
 
     void solve();
 
-    uint ida_star(uint bound);
+    uint ida_star(uint bound, uint g);
 
-    std::vector<std::array<ushort,16>> successors(std::array<ushort,16> node);
+    std::vector<std::tuple<std::array<ushort, 16>,uint,uint>> successors(std::array<ushort,16> node);
 
-    std::array<ushort,16> getStateAfterMove(std::array<ushort,16> node, ushort movedPosition);
+    std::tuple<std::array<ushort, 16>,uint,uint> getStateAfterMove(std::array<ushort,16> node, ushort movedPosition);
 
     uint pathToPosition(int idealposition, int position);
 
